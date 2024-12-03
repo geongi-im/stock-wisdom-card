@@ -3,9 +3,6 @@
 sqlite.db
 
 # 이미지 파일
-*.jpg
-*.jpeg
-*.png
 output/
 
 # 파이썬 관련
