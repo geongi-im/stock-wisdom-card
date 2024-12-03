@@ -3,6 +3,7 @@
 sqlite.db
 
 # 이미지 파일
+img/source/
 output/
 
 # 파이썬 관련
