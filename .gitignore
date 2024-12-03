@@ -1,0 +1,22 @@
+# 데이터베이스
+*.db
+sqlite.db
+
+# 이미지 파일
+*.jpg
+*.jpeg
+*.png
+output/
+
+# 파이썬 관련
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+.venv/
+ENV/
+
+# 시스템 파일
+.DS_Store
+Thumbs.db 
