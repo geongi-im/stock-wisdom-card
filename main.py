@@ -20,10 +20,30 @@ class WisdomCardGenerator:
         if not self.domain_url:
             raise ValueError("DOMAIN_URL이 설정되지 않았습니다. .env 파일을 확인해주세요.")
         
-        # output 디렉토리 생성
+        # output 디렉토리 생성 및 권한 설정
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
+            os.chmod(output_dir, 0o777)  # 폴더 권한을 777로 설정
             print(f"'{output_dir}' 디렉토리가 생성되었습니다.")
+        else:
+            # 기존 폴더의 권한 확인 및 설정
+            current_mode = os.stat(output_dir).st_mode & 0o777
+            if current_mode != 0o777:
+                os.chmod(output_dir, 0o777)
+                print(f"'{output_dir}' 디렉토리 권한을 777로 변경했습니다.")
+
+        # img 디렉토리 체크 및 권한 설정
+        img_dir = 'img'
+        if not os.path.exists(img_dir):
+            os.makedirs(img_dir)
+            os.chmod(img_dir, 0o777)
+            print(f"'{img_dir}' 디렉토리가 생성되었습니다.")
+        else:
+            # 기존 img 폴더의 권한 확인 및 설정
+            current_mode = os.stat(img_dir).st_mode & 0o777
+            if current_mode != 0o777:
+                os.chmod(img_dir, 0o777)
+                print(f"'{img_dir}' 디렉토리 권한을 777로 변경했습니다.")
 
     def generate_and_post(self):
         """명언 카드를 생성하고 인스타그램에 포스팅"""
@@ -66,14 +86,14 @@ class WisdomCardGenerator:
         print(f"이미지 저장 완료: {output_path}")
 
         # 이미지 URL 생성
-        image_url = f"{self.domain_url}/stock-wisdom-card/{output_filename}"
+        image_url = f"{self.domain_url}/stock-wisdom-card/{output_path}"
         print(f"이미지 URL: {image_url}")
 
         # 인스타그램에 포스팅
         try:
             caption = f"""{self.wisdom_data['name_kr']}의 투자 명언
 
-#Money Quotient #MQ #{self.wisdom_data['name_kr']} #{self.wisdom_data['name_en']} #투자명언 #주식명언 #투자대가 #재테크 #경제공부 #주식 #투자"""
+#MQ #MoneyQuotient #{self.wisdom_data['name_kr'].replace(" ", "")} #{self.wisdom_data['name_en'].replace(" ", "")} #투자명언 #주식명언 #투자대가 #재테크 #경제공부 #주식 #투자"""
 
             print("\n인스타그램 포스팅 시도 중...")
             result = self.instagram_api.post_image(image_url, caption)

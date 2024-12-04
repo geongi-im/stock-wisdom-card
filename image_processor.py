@@ -5,8 +5,13 @@ import textwrap
 class ImageProcessor:
     def __init__(self, font_dir='fonts'):
         self.font_dir = font_dir
-        self.quote_font_path = os.path.join(font_dir, 'NanumGothicBold.ttf')
+        self.quote_font_path = os.path.join(font_dir, 'NanumBarunGothicBold.ttf')
         self.author_font_path = os.path.join(font_dir, 'MaruBuri-Bold.ttf')
+        
+        if not os.path.exists(self.quote_font_path):
+            raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {self.quote_font_path}")
+        if not os.path.exists(self.author_font_path):
+            raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {self.author_font_path}")
 
     def get_optimal_font_size(self, text, max_width, max_height, font_path=None, initial_size=60):
         # 시작 폰트 크기
@@ -44,12 +49,15 @@ class ImageProcessor:
                 
             except Exception as e:
                 print(f"폰트 크기 조정 중 오류 발생: {e}")
-                font = ImageFont.load_default()
-                return font, text
+                if font_size == initial_size:  # 첫 시도에서 실패하면 기본 폰트 사용
+                    font = ImageFont.load_default()
+                    return font, text
                 
             font_size -= 2
         
-        return ImageFont.load_default(), text
+        # 모든 시도 실패시 기본 폰트 사용
+        font = ImageFont.load_default()
+        return font, text
 
     def create_card(self, image_path, wisdom_quote, author):
         # 이미지 열기 및 기본 설정
