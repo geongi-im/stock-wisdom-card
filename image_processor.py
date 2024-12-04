@@ -14,7 +14,6 @@ class ImageProcessor:
             raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {self.author_font_path}")
 
     def get_optimal_font_size(self, text, max_width, max_height, font_path=None, initial_size=60):
-        # 시작 폰트 크기
         font_size = initial_size
         
         while font_size > 10:  # 최소 폰트 크기는 10
@@ -25,8 +24,24 @@ class ImageProcessor:
                     font = ImageFont.load_default()
                     return font
                     
-                # 텍스트를 여러 줄로 나눔 (한 줄당 약 15-20자)
-                wrapped_text = textwrap.fill(text, width=20)
+                # 마침표를 기준으로 문장을 나누기
+                sentences = text.split('.')
+                wrapped_lines = []
+                
+                # 각 문장 처리
+                for i, sentence in enumerate(sentences):
+                    if sentence.strip():  # 빈 문장 제외
+                        # 현재 문장을 줄바꿈 처리
+                        wrapped = textwrap.fill(sentence.strip(), width=20)
+                        current_lines = wrapped.split('\n')
+                        
+                        # 마지막 줄에만 마침표 추가 (마지막 문장이 아닌 경우에만)
+                        if i < len(sentences) - 1:
+                            current_lines[-1] = current_lines[-1] + '.'
+                        
+                        wrapped_lines.extend(current_lines)
+                
+                wrapped_text = '\n'.join(wrapped_lines)
                 lines = wrapped_text.split('\n')
                 
                 # 모든 줄의 최대 너비와 총 높이 계산
@@ -49,13 +64,12 @@ class ImageProcessor:
                 
             except Exception as e:
                 print(f"폰트 크기 조정 중 오류 발생: {e}")
-                if font_size == initial_size:  # 첫 시도에서 실패하면 기본 폰트 사용
+                if font_size == initial_size:
                     font = ImageFont.load_default()
                     return font, text
                 
             font_size -= 2
         
-        # 모든 시도 실패시 기본 폰트 사용
         font = ImageFont.load_default()
         return font, text
 
@@ -75,7 +89,7 @@ class ImageProcessor:
         
         # 폰트 설정
         try:
-            formatted_quote = f'"{wisdom_quote}"'
+            formatted_quote = f'{wisdom_quote}'
             quote_font, wrapped_quote = self.get_optimal_font_size(
                 formatted_quote, max_text_width, max_text_height, 
                 self.quote_font_path, 60
@@ -127,7 +141,15 @@ class ImageProcessor:
         return (img_height - total_quote_height) // 2 - 30
 
     def _draw_quote(self, draw, lines, font, img_width, y_pos, line_spacing):
-        for line in lines:
+        for i, line in enumerate(lines):
+            # 첫 줄 시작에 쌍따옴표 추가
+            if i == 0:
+                line = f'"{line}'
+            
+            # 마지막 줄 끝에 쌍따옴표 추가
+            if i == len(lines) - 1:
+                line = f'{line}"'
+            
             bbox = draw.textbbox((0, 0), line, font=font)
             line_width = bbox[2] - bbox[0]
             line_height = bbox[3] - bbox[1]
