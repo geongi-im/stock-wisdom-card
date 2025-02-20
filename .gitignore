@@ -1,6 +1,7 @@
 # 데이터베이스
 *.db
-sqlite.db
+# sqlite.db
+*.log
 
 # 이미지 파일
 img/source/

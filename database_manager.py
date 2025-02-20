@@ -2,10 +2,12 @@ import sqlite3
 import csv
 import os
 from datetime import datetime
+from utils.logger_util import LoggerUtil
 
 class DatabaseManager:
     def __init__(self, db_path='sqlite.db'):
         self.db_path = db_path
+        self.logger = LoggerUtil().get_logger()
         self._initialize_database()
 
     def _initialize_database(self):
@@ -17,7 +19,7 @@ class DatabaseManager:
                 cursor = conn.cursor()
                 
                 if not db_exists:
-                    print(f"새로운 데이터베이스 파일 생성: {self.db_path}")
+                    self.logger.info(f"새로운 데이터베이스 파일 생성: {self.db_path}")
                 
                 # 테이블 존재 여부 확인
                 cursor.execute("""
@@ -26,14 +28,14 @@ class DatabaseManager:
                 """)
                 
                 if cursor.fetchone()[0] == 0:
-                    print("wisdom_list 테이블 생성 중...")
+                    self.logger.info("wisdom_list 테이블 생성 중...")
                     self._create_wisdom_table(cursor)
                     self._import_csv_data(cursor)
                     conn.commit()
-                    print("테이블 생성 및 데이터 임포트 완료")
+                    self.logger.info("테이블 생성 및 데이터 임포트 완료")
         
         except sqlite3.Error as e:
-            print(f"데이터베이스 초기화 중 오류 발생: {e}")
+            self.logger.error(f"데이터베이스 초기화 중 오류 발생: {e}")
             raise
 
     def _create_wisdom_table(self, cursor):
@@ -55,7 +57,7 @@ class DatabaseManager:
         """CSV 파일에서 데이터 임포트"""
         csv_path = 'wisdom.csv'
         if not os.path.exists(csv_path):
-            print(f"경고: {csv_path} 파일을 찾을 수 없습니다.")
+            self.logger.warning(f"경고: {csv_path} 파일을 찾을 수 없습니다.")
             return
         
         try:
@@ -72,10 +74,10 @@ class DatabaseManager:
                         ''', (row[0], row[1], row[2], row[3]))
                         insert_count += 1
                 
-                print(f"{insert_count}개의 데이터가 임포트되었습니다.")
+                self.logger.info(f"{insert_count}개의 데이터가 임포트되었습니다.")
         
         except Exception as e:
-            print(f"CSV 데이터 임포트 중 오류 발생: {e}")
+            self.logger.error(f"CSV 데이터 임포트 중 오류 발생: {e}")
             raise
 
     def get_random_wisdom(self):
@@ -98,11 +100,11 @@ class DatabaseManager:
                         'name_kr': result[2],
                         'wisdom_kr': result[3]
                     }
-                print("조건에 맞는 데이터가 없습니다.")
+                self.logger.warning("조건에 맞는 데이터가 없습니다.")
                 return None
                 
         except sqlite3.Error as e:
-            print(f"데이터베이스 오류: {e}")
+            self.logger.error(f"데이터베이스 오류: {e}")
             return None
 
     def update_wisdom_file(self, idx, filename):
@@ -116,5 +118,5 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except sqlite3.Error as e:
-            print(f"데이터베이스 업데이트 오류: {e}")
+            self.logger.error(f"데이터베이스 업데이트 오류: {e}")
             return False 

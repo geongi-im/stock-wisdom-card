@@ -1,12 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont
 import os
 import textwrap
+from utils.logger_util import LoggerUtil
 
 class ImageProcessor:
     def __init__(self, font_dir='fonts'):
         self.font_dir = font_dir
         self.quote_font_path = os.path.join(font_dir, 'NanumBarunGothicBold.ttf')
         self.author_font_path = os.path.join(font_dir, 'MaruBuri-Bold.ttf')
+        self.logger = LoggerUtil().get_logger()
         
         if not os.path.exists(self.quote_font_path):
             raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {self.quote_font_path}")
@@ -63,7 +65,7 @@ class ImageProcessor:
                     return font, wrapped_text
                 
             except Exception as e:
-                print(f"폰트 크기 조정 중 오류 발생: {e}")
+                self.logger.error(f"폰트 크기 조정 중 오류 발생: {e}")
                 if font_size == initial_size:
                     font = ImageFont.load_default()
                     return font, text
