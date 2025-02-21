@@ -5,9 +5,11 @@ from utils.logger_util import LoggerUtil
 
 class ImageProcessor:
     def __init__(self, font_dir='fonts'):
-        self.font_dir = font_dir
-        self.quote_font_path = os.path.join(font_dir, 'NanumBarunGothicBold.ttf')
-        self.author_font_path = os.path.join(font_dir, 'MaruBuri-Bold.ttf')
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.font_dir = os.path.join(current_dir, font_dir)
+        self.quote_font_path = os.path.join(self.font_dir, 'NanumBarunGothicBold.ttf')
+        self.author_font_path = os.path.join(self.font_dir, 'MaruBuri-Bold.ttf')
         self.logger = LoggerUtil().get_logger()
         
         if not os.path.exists(self.quote_font_path):
