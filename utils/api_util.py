@@ -167,14 +167,15 @@ class ApiUtil:
             self.logger.error(error_msg)
             raise ApiError(500, error_msg)
 
-    def upload_wisdom_card(self, image_path: str, author: str, wisdom_text: str, name_kr: str, name_en: str):
+    def upload_wisdom_card(self, image_path: str, author: str, wisdom_kr: str, wisdom_en: str, name_kr: str, name_en: str):
         """
         명언 카드 이미지를 API 서버에 업로드
         
         Args:
             image_path (str): 업로드할 이미지 파일 경로
             author (str): 저자 정보
-            wisdom_text (str): 명언 텍스트
+            wisdom_kr (str): 명언 한글 텍스트
+            wisdom_en (str): 명언 영문 텍스트
             name_kr (str): 저자 한글 이름
             name_en (str): 저자 영문 이름
             
@@ -211,7 +212,8 @@ class ApiUtil:
 
             # 게시글 내용 생성
             content = f"""<strong><h3>[{name_kr} ({name_en})의 투자 명언]</h3></strong><br>
-            <p class="quote">{wisdom_text}</p><br>
+            <p class="quote">{wisdom_kr}</p><br>
+            <p class="quote">{wisdom_en}</p><br>
             <p>
                 <a href="#">#{name_kr}</a> 
                 <a href="#">#{name_en}</a> 

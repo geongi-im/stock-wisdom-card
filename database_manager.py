@@ -6,7 +6,12 @@ from utils.logger_util import LoggerUtil
 
 class DatabaseManager:
     def __init__(self, db_path='sqlite.db'):
-        self.db_path = db_path
+        # 절대 경로로 변환
+        if not os.path.isabs(db_path):
+            self.db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), db_path)
+        else:
+            self.db_path = db_path
+            
         self.logger = LoggerUtil().get_logger()
         self._initialize_database()
 
@@ -55,7 +60,7 @@ class DatabaseManager:
 
     def _import_csv_data(self, cursor):
         """CSV 파일에서 데이터 임포트"""
-        csv_path = 'wisdom.csv'
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wisdom.csv')
         if not os.path.exists(csv_path):
             self.logger.warning(f"경고: {csv_path} 파일을 찾을 수 없습니다.")
             return
@@ -85,7 +90,7 @@ class DatabaseManager:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT idx, name_en, name_kr, wisdom_kr 
+                    SELECT idx, name_en, name_kr, wisdom_kr, wisdom_en
                     FROM wisdom_list 
                     WHERE open_yn = 1 AND file_name IS NULL 
                     ORDER BY RANDOM() 
@@ -98,7 +103,8 @@ class DatabaseManager:
                         'idx': result[0],
                         'name_en': result[1],
                         'name_kr': result[2],
-                        'wisdom_kr': result[3]
+                        'wisdom_kr': result[3],
+                        'wisdom_en': result[4]
                     }
                 self.logger.warning("조건에 맞는 데이터가 없습니다.")
                 return None

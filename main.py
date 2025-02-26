@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from utils.logger_util import LoggerUtil
 from utils.api_util import ApiUtil
 
-# 환경 변수 로드
 load_dotenv()
 
 class WisdomCardGenerator:
@@ -25,18 +24,19 @@ class WisdomCardGenerator:
             raise ValueError("DOMAIN_URL이 설정되지 않았습니다. .env 파일을 확인해주세요.")
         
         # output 디렉토리 생성 및 권한 설정
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            os.chmod(output_dir, 0o777)
-            self.logger.info(f"'{output_dir}' 디렉토리가 생성되었습니다.")
+        output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.output_dir)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+            os.chmod(output_path, 0o777)
+            self.logger.info(f"'{output_path}' 디렉토리가 생성되었습니다.")
         else:
-            current_mode = os.stat(output_dir).st_mode & 0o777
+            current_mode = os.stat(output_path).st_mode & 0o777
             if current_mode != 0o777:
-                os.chmod(output_dir, 0o777)
-                self.logger.info(f"'{output_dir}' 디렉토리 권한을 777로 변경했습니다.")
+                os.chmod(output_path, 0o777)
+                self.logger.info(f"'{output_path}' 디렉토리 권한을 777로 변경했습니다.")
 
         # img 디렉토리 체크 및 권한 설정
-        img_dir = 'img'
+        img_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'img')
         if not os.path.exists(img_dir):
             os.makedirs(img_dir)
             os.chmod(img_dir, 0o777)
@@ -60,6 +60,7 @@ class WisdomCardGenerator:
         self.logger.info(f"영문 이름: {self.wisdom_data['name_en']}")
         self.logger.info(f"한글 이름: {self.wisdom_data['name_kr']}")
         self.logger.info(f"명언(한글): {self.wisdom_data['wisdom_kr']}")
+        self.logger.info(f"명언(영문): {self.wisdom_data['wisdom_en']}")
         self.logger.info("==================")
 
         # 이미지 선택 및 생성
@@ -84,14 +85,15 @@ class WisdomCardGenerator:
         if not output_filename:
             return False
 
-        output_path = os.path.join(self.output_dir, output_filename)
+        output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.output_dir, output_filename)
         self.logger.info(f"이미지 저장 완료: {output_path}")
 
         # API를 통해 이미지 업로드
         upload_result = self.api_util.upload_wisdom_card(
             image_path=output_path,
             author=author,
-            wisdom_text=self.wisdom_data['wisdom_kr'],
+            wisdom_kr=self.wisdom_data['wisdom_kr'],
+            wisdom_en=self.wisdom_data['wisdom_en'],
             name_kr=self.wisdom_data['name_kr'],
             name_en=self.wisdom_data['name_en']
         )
@@ -142,7 +144,7 @@ class WisdomCardGenerator:
             return False
 
     def _get_random_image(self, name_en):
-        image_folder = f'img/{name_en}'
+        image_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'img', name_en)
         try:
             image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
             if not image_files:
@@ -156,12 +158,13 @@ class WisdomCardGenerator:
     def _save_image(self, img):
         try:
             current_date = datetime.now().strftime('%Y%m%d')
-            output_path = os.path.join(self.output_dir, f"{current_date}.jpeg")
+            output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.output_dir, f"{current_date}.jpeg")
             
             # 중복 파일명 처리
             counter = 1
             while os.path.exists(output_path):
                 output_path = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)), 
                     self.output_dir, 
                     f"{current_date}_{counter}.jpeg"
                 )

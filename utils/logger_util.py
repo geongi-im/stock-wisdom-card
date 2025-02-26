@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from datetime import datetime
 
@@ -14,11 +15,11 @@ class LoggerUtil:
     def __init__(self):
         if not LoggerUtil._initialized:
             # 로그 디렉토리 생성
-            log_dir = Path('log')
-            log_dir.mkdir(exist_ok=True)
+            log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log')
+            os.makedirs(log_dir, exist_ok=True)
 
             # 로그 파일 설정
-            log_file = log_dir / f"{datetime.now().strftime('%Y-%m-%d')}_log.log"
+            log_file = os.path.join(log_dir, f"{datetime.now().strftime('%Y-%m-%d')}_log.log")
 
             # 로거 생성
             self.logger = logging.getLogger('MQLogger')

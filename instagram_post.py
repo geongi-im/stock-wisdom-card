@@ -5,7 +5,6 @@ from datetime import datetime
 import time
 from utils.logger_util import LoggerUtil
 
-# 환경 변수 로드
 load_dotenv()
 
 class InstagramAPI:

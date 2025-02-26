@@ -4,13 +4,13 @@ import textwrap
 from utils.logger_util import LoggerUtil
 
 class ImageProcessor:
-    def __init__(self, font_dir='fonts'):
-        # 스크립트의 실제 위치를 기준으로 경로 설정
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.font_dir = os.path.join(current_dir, font_dir)
-        self.quote_font_path = os.path.join(self.font_dir, 'NanumBarunGothicBold.ttf')
-        self.author_font_path = os.path.join(self.font_dir, 'MaruBuri-Bold.ttf')
+    def __init__(self):
         self.logger = LoggerUtil().get_logger()
+        
+        # 폰트 파일 경로 계산
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.quote_font_path = os.path.join(current_dir, 'fonts', 'NanumBarunGothicBold.ttf')
+        self.author_font_path = os.path.join(current_dir, 'fonts', 'MaruBuri-Bold.ttf')
         
         if not os.path.exists(self.quote_font_path):
             raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {self.quote_font_path}")
@@ -90,7 +90,7 @@ class ImageProcessor:
         draw = ImageDraw.Draw(img)
         max_text_width = int(img.size[0] * 0.8)
         max_text_height = int(img.size[1] * 0.5)
-        
+                
         # 폰트 설정
         try:
             formatted_quote = f'{wisdom_quote}'
