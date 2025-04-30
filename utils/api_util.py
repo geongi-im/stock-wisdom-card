@@ -60,7 +60,7 @@ class ApiUtil:
 
     def create_post(self, title: str, content: str, category: str, writer: str, image_paths: Optional[List[str]] = None):
         """게시글 생성 API 호출"""
-        url = f"{self.base_url}/board"
+        url = f"{self.base_url}/board-content"
         
         try:
             if image_paths:
@@ -182,7 +182,7 @@ class ApiUtil:
         Returns:
             dict: 성공 시 {"success": True, "image_url": "..."}, 실패 시 {"success": False, "error": "에러 메시지"}
         """
-        url = f"{self.base_url}/board"
+        url = f"{self.base_url}/board-content"
         
         try:
             self.logger.info(f"명언 카드 업로드 시작 - 저자: {author}")
