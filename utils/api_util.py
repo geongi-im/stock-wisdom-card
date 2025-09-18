@@ -189,11 +189,13 @@ class ApiUtil:
             
             # 이미지 처리
             files = {}
+            thumbnail_image = {}
             if os.path.exists(image_path):
                 try:
                     compressed_image, format = self._compress_image(image_path)
                     original_filename = os.path.basename(image_path)
                     files['image[0]'] = (original_filename, compressed_image, f'image/{format}')
+                    thumbnail_image['thumbnail_image'] = (original_filename, compressed_image, f'image/{format}')
                     self.logger.debug(f"이미지 추가: {original_filename}")
                 except Exception as e:
                     error_msg = f"이미지 처리 실패: {image_path} - {str(e)}"
@@ -244,6 +246,7 @@ class ApiUtil:
                 
                 # 이미지 파일 추가
                 form_data.update(files)
+                form_data.update(thumbnail_image)
                 
                 # 디버그 로그 추가
                 self.logger.debug(f"최종 전송 데이터: {[(k, v[0] if isinstance(v, tuple) else v) for k, v in form_data.items()]}")
