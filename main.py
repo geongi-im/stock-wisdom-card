@@ -17,11 +17,11 @@ class WisdomCardGenerator:
         self.db_manager = DatabaseManager()
         self.instagram_api = InstagramAPI()
         self.api_util = ApiUtil()
-        self.domain_url = os.getenv("DOMAIN_URL")
+        self.base_url = os.getenv("BASE_URL")
         self.logger = LoggerUtil().get_logger()
         
-        if not self.domain_url:
-            raise ValueError("DOMAIN_URL이 설정되지 않았습니다. .env 파일을 확인해주세요.")
+        if not self.base_url:
+            raise ValueError("BASE_URL이 설정되지 않았습니다. .env 파일을 확인해주세요.")
         
         # output 디렉토리 생성 및 권한 설정
         output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.output_dir)
